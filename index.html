@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEFI: Nace una leyenda</title>
+    <title>Simulador de Fútbol - Liga, Copa, Supercopa y Rivales</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -23,20 +23,16 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 10px;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            min-height: 100dvh;
-            box-sizing: border-box;
         }
 
         .game-container {
             width: 100%;
             max-width: 650px;
-            height: 92vh;
-            max-height: 850px;
             background-color: var(--card-bg);
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
@@ -112,9 +108,8 @@
         }
 
         .main-content {
-            padding: 15px;
-            flex: 1;
-            overflow-y: auto;
+            padding: 20px;
+            min-height: 220px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -287,35 +282,6 @@
         .history-list { font-size: 0.8rem; line-height: 1.6; }
         .history-item { border-bottom: 1px solid #334155; padding: 6px 0; }
         .hidden { display: none !important; }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 0;
-            }
-
-            .game-container {
-                height: 100vh;
-                height: 100dvh;
-                border-radius: 0;
-            }
-
-            .stats-bar {
-                padding: 8px 5px;
-            }
-
-            .stat-item {
-                font-size: 0.68rem;
-            }
-
-            .stat-value {
-                font-size: 0.85rem;
-            }
-
-            button.choice-btn, .form-btn {
-                padding: 12px 10px;
-                font-size: 0.85rem;
-            }
-        }
     </style>
 </head>
 <body>
