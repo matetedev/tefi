@@ -810,13 +810,14 @@
         }
 
         function playSupercupMatch() {
-            if (!cupChampion) {
-                let all = getAllTeams();
-                cupChampion = all[Math.floor(Math.random() * all.length)];
-            }
+            // Asegurar campeones en caso de imprevisto
             if (!leagueChampion) {
-                let all = getAllTeams();
-                leagueChampion = all[Math.floor(Math.random() * all.length)];
+                let fallback = getAllTeams().filter(t => t !== game.team);
+                leagueChampion = fallback[Math.floor(Math.random() * fallback.length)];
+            }
+            if (!cupChampion) {
+                let fallback = getAllTeams().filter(t => t !== game.team && t !== leagueChampion);
+                cupChampion = fallback[Math.floor(Math.random() * fallback.length)];
             }
 
             document.getElementById('week-display').innerText = `Temp. ${game.season} | Supercopa Nacional`;
@@ -852,7 +853,7 @@
                 } else {
                     supercupChampion = Math.random() < 0.5 ? leagueChampion : cupChampion;
                     let loser = supercupChampion === leagueChampion ? cupChampion : leagueChampion;
-                    document.getElementById('event-desc').innerText = `En la definición de la Supercopa:\n⚡ ${supercupChampion} venció a ${loser} y levantó el trofeo.`;
+                    document.getElementById('event-desc').innerText = `No participaste de esta Supercopa.\n\nEn el duelo de la Máquina:\n⚡ ${supercupChampion} venció a ${loser} y levantó la Supercopa Nacional.`;
                 }
             }
 
@@ -862,7 +863,7 @@
             container.innerHTML = '';
             const btn = document.createElement('button');
             btn.className = 'choice-btn primary-option';
-            btn.innerText = 'Cerrar Temporada';
+            btn.innerText = 'Ver Resumen de Fin de Temporada';
             btn.onclick = () => finishSeason();
             container.appendChild(btn);
         }
@@ -872,6 +873,7 @@
             let finalCopa = cupChampion || "Sin Definir";
             let finalSupercopa = supercupChampion || "Sin Definir";
 
+            // Guardar historial
             championsHistory.unshift({
                 season: game.season,
                 age: game.age,
@@ -896,14 +898,15 @@
                 return;
             }
 
-            resetSeasonPoints();
-
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
             const btn = document.createElement('button');
             btn.className = 'choice-btn primary-option';
             btn.innerText = 'Iniciar Nueva Temporada';
-            btn.onclick = () => loadFreeAgentEvent();
+            btn.onclick = () => {
+                resetSeasonPoints();
+                loadFreeAgentEvent();
+            };
             container.appendChild(btn);
         }
 
