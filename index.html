@@ -804,20 +804,66 @@
             container.innerHTML = '';
             const btn = document.createElement('button');
             btn.className = 'choice-btn primary-option';
+            btn.innerText = 'Ir a la Supercopa Nacional';
+            btn.onclick = () => playSupercupMatch();
+            container.appendChild(btn);
+        }
+
+        function playSupercupMatch() {
+            if (!cupChampion) {
+                let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
+                cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
+            }
+
+            document.getElementById('week-display').innerText = `Temp. ${game.season} | Supercopa Nacional`;
+            document.getElementById('event-title').innerText = `⚡ SUPERCOPA: ${leagueChampion} vs ${cupChampion}`;
+
+            let isUserInSupercup = (leagueChampion === game.team || cupChampion === game.team);
+
+            if (isUserInSupercup) {
+                let rival = leagueChampion === game.team ? cupChampion : leagueChampion;
+                let myScore = Math.floor(Math.random() * (game.skill / 18 + 1)) + 1;
+                let rivalScore = Math.floor(Math.random() * 3);
+
+                if (myScore === rivalScore) myScore++;
+
+                let desiredGoals = calculateMatchGoals();
+                let goalsScored = Math.min(myScore, desiredGoals);
+
+                game.matchesPlayed++;
+                game.goals += goalsScored;
+
+                if (myScore > rivalScore) {
+                    supercupChampion = game.team;
+                    game.supercups++;
+                    document.getElementById('event-desc').innerText = `¡GANASTE LA SUPERCOPA NACIONAL!\n\n${game.team} ${myScore} - ${rivalScore} ${rival}\nConvertiste ${goalsScored} gol(es).\n\n⚡ ¡CAMPEÓN DE SUPERCOPA!`;
+                } else {
+                    supercupChampion = rival;
+                    document.getElementById('event-desc').innerText = `Perdiste la Supercopa Nacional.\n\n${game.team} ${myScore} - ${rivalScore} ${rival}\nConvertiste ${goalsScored} gol(es).\n\nEl campeón de la Supercopa es ${rival}.`;
+                }
+            } else {
+                if (leagueChampion === cupChampion) {
+                    supercupChampion = leagueChampion;
+                    document.getElementById('event-desc').innerText = `${leagueChampion} ganó la Liga y la Copa Nacional, adjudicándose automáticamente la Supercopa.`;
+                } else {
+                    supercupChampion = Math.random() < 0.5 ? leagueChampion : cupChampion;
+                    let loser = supercupChampion === leagueChampion ? cupChampion : leagueChampion;
+                    document.getElementById('event-desc').innerText = `En la definición de la Supercopa:\n⚡ ${supercupChampion} venció a ${loser} y levantó el trofeo.`;
+                }
+            }
+
+            updateUI();
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn primary-option';
             btn.innerText = 'Cerrar Temporada';
             btn.onclick = () => finishSeason();
             container.appendChild(btn);
         }
 
         function finishSeason() {
-            if (!cupChampion) {
-                let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
-                cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
-            }
-
-            supercupChampion = Math.random() < 0.5 ? leagueChampion : cupChampion;
-            if (supercupChampion === game.team) game.supercups++;
-
             championsHistory.unshift({
                 season: game.season,
                 age: game.age,
@@ -825,6 +871,10 @@
                 copa: cupChampion,
                 supercopa: supercupChampion
             });
+
+            document.getElementById('week-display').innerText = `Resumen de Fin de Temporada`;
+            document.getElementById('event-title').innerText = `Resumen de la Temporada ${game.season}`;
+            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${leagueChampion}\n🍷 Campeón Copa Nacional: ${cupChampion}\n⚡ Campeón Supercopa: ${supercupChampion}`;
 
             game.season++;
             game.age++;
@@ -839,9 +889,6 @@
             }
 
             resetSeasonPoints();
-
-            document.getElementById('event-title').innerText = `Resumen de la Temporada ${game.season - 1}`;
-            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${leagueChampion}\n🍷 Campeón Copa Nacional: ${cupChampion}\n⚡ Campeón Supercopa: ${supercupChampion}`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
