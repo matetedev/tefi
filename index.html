@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEFI: Nace una leyendas</title>
+    <title>Simulador de Fútbol - Liga, Copa, Promoción y Rivales</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -660,7 +660,11 @@
             let playerWon = Math.random() < (game.skill / 100);
             
             if (playerWon) {
-                let cupGoals = calculateMatchGoals();
+                // En copa si se gana, el equipo mete al menos 1 gol
+                let myTeamGoals = Math.floor(Math.random() * 3) + 1;
+                let desiredGoals = calculateMatchGoals();
+                let cupGoals = Math.min(myTeamGoals, desiredGoals);
+                
                 game.goals += cupGoals;
                 game.matchesPlayed++;
                 if (cupStage < 3) {
@@ -782,9 +786,9 @@
                 }
             });
 
-            // CORRECCIÓN: Los goles individuales se limitan estrictamente a los goles de tu equipo en el partido
-            let calculatedGoals = calculateMatchGoals();
-            let goalsScored = Math.min(myScore, calculatedGoals);
+            // VÍNCULO CORREGIDO: Los goles del jugador jamás superan el total de goles de su equipo en el partido (myScore)
+            let desiredGoals = calculateMatchGoals();
+            let goalsScored = Math.min(myScore, desiredGoals);
             game.goals += goalsScored;
 
             sortTables();
@@ -853,7 +857,10 @@
             btn.onclick = () => {
                 let playerWon = Math.random() < (game.skill / 100);
                 game.matchesPlayed++;
-                let promoGoals = calculateMatchGoals();
+                
+                let myTeamGoals = playerWon ? Math.floor(Math.random() * 3) + 1 : 0;
+                let desiredGoals = calculateMatchGoals();
+                let promoGoals = Math.min(myTeamGoals, desiredGoals);
                 game.goals += promoGoals;
 
                 if (playerWon) {
@@ -950,7 +957,9 @@
             if (won) {
                 supercupChampion = game.team;
                 game.supercups++;
-                let scGoals = calculateMatchGoals();
+                let myTeamGoals = Math.floor(Math.random() * 3) + 1;
+                let desiredGoals = calculateMatchGoals();
+                let scGoals = Math.min(myTeamGoals, desiredGoals);
                 game.goals += scGoals;
                 document.getElementById('event-desc').innerText = `¡CAMPEÓN DE LA SUPERCOPA! Derrotaste a ${opponent} (${scGoals} goles).`;
             } else {
