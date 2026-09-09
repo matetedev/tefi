@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Fútbol - Liga, Copa, Promoción y Rivales</title>
+    <title>TEFI: Nace una leyendas</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -782,7 +782,9 @@
                 }
             });
 
-            let goalsScored = calculateMatchGoals();
+            // CORRECCIÓN: Los goles individuales se limitan estrictamente a los goles de tu equipo en el partido
+            let calculatedGoals = calculateMatchGoals();
+            let goalsScored = Math.min(myScore, calculatedGoals);
             game.goals += goalsScored;
 
             sortTables();
