@@ -811,8 +811,12 @@
 
         function playSupercupMatch() {
             if (!cupChampion) {
-                let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
-                cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
+                let all = getAllTeams();
+                cupChampion = all[Math.floor(Math.random() * all.length)];
+            }
+            if (!leagueChampion) {
+                let all = getAllTeams();
+                leagueChampion = all[Math.floor(Math.random() * all.length)];
             }
 
             document.getElementById('week-display').innerText = `Temp. ${game.season} | Supercopa Nacional`;
@@ -864,17 +868,21 @@
         }
 
         function finishSeason() {
+            let finalLiga = leagueChampion || "Sin Definir";
+            let finalCopa = cupChampion || "Sin Definir";
+            let finalSupercopa = supercupChampion || "Sin Definir";
+
             championsHistory.unshift({
                 season: game.season,
                 age: game.age,
-                liga: leagueChampion,
-                copa: cupChampion,
-                supercopa: supercupChampion
+                liga: finalLiga,
+                copa: finalCopa,
+                supercopa: finalSupercopa
             });
 
             document.getElementById('week-display').innerText = `Resumen de Fin de Temporada`;
             document.getElementById('event-title').innerText = `Resumen de la Temporada ${game.season}`;
-            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${leagueChampion}\n🍷 Campeón Copa Nacional: ${cupChampion}\n⚡ Campeón Supercopa: ${supercupChampion}`;
+            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${finalLiga}\n🍷 Campeón Copa Nacional: ${finalCopa}\n⚡ Campeón Supercopa: ${finalSupercopa}`;
 
             game.season++;
             game.age++;
