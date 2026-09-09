@@ -295,7 +295,7 @@
                 <h3>📊 Primera División - Tablas</h3>
                 
                 <div class="table-section">
-                    <h4>División 1 (Puntero va a la Final)</h4>
+                    <h4>Grupo A (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
                             <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
@@ -305,7 +305,7 @@
                 </div>
 
                 <div class="table-section">
-                    <h4>División 2 (Puntero va a la Final)</h4>
+                    <h4>Grupo B (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
                             <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
@@ -415,8 +415,8 @@
         }
 
         function getCurrentDivision() {
-            if (div1.some(t => t.name === game.team)) return "División 1";
-            if (div2.some(t => t.name === game.team)) return "División 2";
+            if (div1.some(t => t.name === game.team)) return "Grupo A";
+            if (div2.some(t => t.name === game.team)) return "Grupo B";
             return "Sin División";
         }
 
@@ -496,7 +496,7 @@
             let otherTeams = getAllTeams().filter(t => t !== game.team);
 
             otherTeams.forEach(club => {
-                let divName = div1.some(t => t.name === club) ? "División 1" : "División 2";
+                let divName = div1.some(t => t.name === club) ? "Grupo A" : "Grupo B";
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = `Fichar por ${club} (${divName})`;
@@ -568,7 +568,7 @@
             let offers = availableTeams.sort(() => 0.5 - Math.random()).slice(0, 3);
 
             offers.forEach(club => {
-                let divName = div1.some(t => t.name === club) ? "División 1" : "División 2";
+                let divName = div1.some(t => t.name === club) ? "Grupo A" : "Grupo B";
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = `Fichar por ${club} (${divName})`;
@@ -649,7 +649,7 @@
 
             game.matchCount++;
             let currentDivName = getCurrentDivision();
-            let currentTable = currentDivName === "División 1" ? div1 : div2;
+            let currentTable = currentDivName === "Grupo A" ? div1 : div2;
 
             let opponents = currentTable.filter(t => t.name !== game.team).map(t => t.name);
             currentRival = opponents[Math.floor(Math.random() * opponents.length)];
@@ -795,7 +795,7 @@
             } else {
                 leagueChampion = Math.random() < 0.5 ? winner1 : winner2;
                 let loserFinal = leagueChampion === winner1 ? winner2 : winner1;
-                document.getElementById('event-desc').innerText = `No lograste quedar 1° de tu división para jugar la final.\n\nEn la Gran Final de Primera División:\n🏆 ${leagueChampion} superó a ${loserFinal} y se coronó Campeón.`;
+                document.getElementById('event-desc').innerText = `No lograste quedar 1° de tu grupo para jugar la final.\n\nEn la Gran Final de Primera División:\n🏆 ${leagueChampion} superó a ${loserFinal} y se coronó Campeón.`;
             }
 
             updateUI();
