@@ -257,6 +257,7 @@
             <div class="choices-container" id="choices-container"></div>
         </div>
 
+        <!-- MODAL PALMARÉS -->
         <div id="palmares-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3>🏆 Palmarés Personal</h3>
@@ -274,6 +275,7 @@
             </div>
         </div>
 
+        <!-- MODAL HISTORIAL -->
         <div id="history-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3>📜 Historial de Campeones</h3>
@@ -406,10 +408,12 @@
         }
 
         function saveCharacter() {
-            game.name = document.getElementById('input-name').value;
+            const nameInput = document.getElementById('input-name').value;
+            game.name = nameInput.trim() !== "" ? nameInput : "Crack Martínez";
             game.nationality = document.getElementById('input-nationality').value;
             game.position = document.getElementById('input-position').value;
             game.number = document.getElementById('input-dorsal').value;
+            
             initTables();
             updateUI();
             loadFreeAgentEvent();
@@ -663,7 +667,9 @@
             loadFreeAgentEvent();
         }
 
-        window.onload = () => loadCreationScreen();
+        window.onload = () => {
+            loadCreationScreen();
+        };
     </script>
 </body>
 </html>
