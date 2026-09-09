@@ -660,7 +660,6 @@
             let playerWon = Math.random() < (game.skill / 100);
             
             if (playerWon) {
-                // En copa si se gana, el equipo mete al menos 1 gol
                 let myTeamGoals = Math.floor(Math.random() * 3) + 1;
                 let desiredGoals = calculateMatchGoals();
                 let cupGoals = Math.min(myTeamGoals, desiredGoals);
@@ -750,12 +749,23 @@
             updateUI();
         }
 
+        // FUNCIÓN QUE SIMULA RESULTADOS PARA DIVISIONES EXTERNAS/RESTO DE EQUIPOS
+        function simulateAllDivisions(otherDiv) {
+            otherDiv.forEach(team => {
+                team.pj++;
+                let rand = Math.random();
+                if (rand < 0.38) team.pts += 3;
+                else if (rand < 0.70) team.pts += 1;
+            });
+        }
+
         function playMatch() {
             let myScore = Math.floor(Math.random() * (game.skill / 20 + 1));
             let rivalScore = Math.floor(Math.random() * 3);
 
             let currentDivName = getCurrentDivision();
             let currentTable = currentDivName === "Primera A" ? divisionA : divisionB;
+            let otherTable = currentDivName === "Primera A" ? divisionB : divisionA;
 
             let myTeamObj = currentTable.find(t => t.name === game.team);
             let rivalTeamObj = currentTable.find(t => t.name === currentRival);
@@ -777,16 +787,19 @@
                 if (rivalTeamObj) rivalTeamObj.pts += 3;
             }
 
+            // Simular para los demás equipos de la misma liga
             currentTable.forEach(team => {
                 if (team.name !== game.team && team.name !== currentRival) {
                     team.pj++;
                     let rand = Math.random();
-                    if (rand < 0.33) team.pts += 3;
-                    else if (rand < 0.66) team.pts += 1;
+                    if (rand < 0.38) team.pts += 3;
+                    else if (rand < 0.70) team.pts += 1;
                 }
             });
 
-            // VÍNCULO CORREGIDO: Los goles del jugador jamás superan el total de goles de su equipo en el partido (myScore)
+            // ✅ CORRECCIÓN CLAVE: Simular los partidos de la otra división
+            simulateAllDivisions(otherTable);
+
             let desiredGoals = calculateMatchGoals();
             let goalsScored = Math.min(myScore, desiredGoals);
             game.goals += goalsScored;
@@ -795,25 +808,23 @@
             updateUI();
 
             document.getElementById('event-title').innerText = `Resultado: ${game.team} ${myScore} - ${rivalScore} ${currentRival}`;
-            
-            let goalsText = goalsScored > 0 
-                ? `Anotaste ${goalsScored} gol(es) en este encuentro.` 
-                : `No anotaste goles en este encuentro.`;
-            document.getElementById('event-desc').innerText = goalsText;
+            let goalsText = goalsScored > 0 ? ` ¡Anotaste ${goalsScored} gol(es)!` : '';
+            document.getElementById('event-desc').innerText = `Finalizó el partido.${goalsText}\nPosición de tu equipo en la tabla: ${currentTable.findIndex(t => t.name === game.team) + 1}º.`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
             const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerText = 'Continuar';
+            btn.className = 'choice-btn primary-option';
+            btn.innerText = 'Siguiente Fecha';
             btn.onclick = () => startSeasonLoop();
             container.appendChild(btn);
         }
 
         function finishSeason() {
             sortTables();
-            leagueChampion = divisionA[0].name;
-            if (leagueChampion === game.team) {
+            
+            let divAChampion = divisionA[0].name;
+            if (divAChampion === game.team) {
                 game.titles++;
             }
 
@@ -821,187 +832,56 @@
                 cupChampion = getAllTeams()[Math.floor(Math.random() * getAllTeams().length)];
             }
 
-            let anteultimoA = divisionA[divisionA.length - 2];
-            let segundoB = divisionB[1];
-
-            let playerInPromo = (game.team === anteultimoA.name || game.team === segundoB.name);
-
-            if (playerInPromo) {
-                playPromotionMatch(anteultimoA, segundoB);
-            } else {
-                let promoWinnerIsB = Math.random() < 0.5;
-                if (promoWinnerIsB) {
-                    swapTeams(anteultimoA, segundoB);
-                }
-                processDirectAscentAndDescent();
-                checkSupercup();
-            }
-        }
-
-        function playPromotionMatch(anteultimoA, segundoB) {
-            let isPlayerDivA = (game.team === anteultimoA.name);
-            let opponentName = isPlayerDivA ? segundoB.name : anteultimoA.name;
-
-            document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Partido de Promoción`;
-            document.getElementById('event-title').innerText = `🔥 PROMOCIÓN: ${game.team} vs ${opponentName}`;
-            document.getElementById('event-desc').innerText = isPlayerDivA 
-                ? `¡Te jugás la permanencia en Primera A contra el 2° de Primera B (${opponentName})!` 
-                : `¡Te jugás el ascenso a Primera A contra el anteúltimo de Primera A (${opponentName})!`;
-
-            const container = document.getElementById('choices-container');
-            container.innerHTML = '';
-
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerText = 'Jugar Partido de Promoción';
-            btn.onclick = () => {
-                let playerWon = Math.random() < (game.skill / 100);
-                game.matchesPlayed++;
-                
-                let myTeamGoals = playerWon ? Math.floor(Math.random() * 3) + 1 : 0;
-                let desiredGoals = calculateMatchGoals();
-                let promoGoals = Math.min(myTeamGoals, desiredGoals);
-                game.goals += promoGoals;
-
-                if (playerWon) {
-                    if (isPlayerDivA) {
-                        document.getElementById('event-desc').innerText = `¡GANASTE! Mantenés la categoría en Primera A derrotando a ${opponentName} (${promoGoals} goles).`;
-                    } else {
-                        game.promotions++;
-                        document.getElementById('event-desc').innerText = `¡GANASTE Y ASCENDISTE! ${game.team} jugará en Primera A la próxima temporada (${promoGoals} goles).`;
-                        swapTeams(anteultimoA, segundoB);
-                    }
-                } else {
-                    if (isPlayerDivA) {
-                        game.relegations++;
-                        document.getElementById('event-desc').innerText = `PERDISTE. ${game.team} descendió a Primera B tras caer ante ${opponentName}.`;
-                        swapTeams(anteultimoA, segundoB);
-                    } else {
-                        document.getElementById('event-desc').innerText = `PERDISTE. Te quedás en Primera B una temporada más.`;
-                    }
-                }
-                
-                processDirectAscentAndDescent();
-                updateUI();
-
-                container.innerHTML = '';
-                const nextBtn = document.createElement('button');
-                nextBtn.className = 'choice-btn';
-                nextBtn.innerText = 'Continuar a Supercopa / Cierre';
-                nextBtn.onclick = () => checkSupercup();
-                container.appendChild(nextBtn);
-            };
-
-            container.appendChild(btn);
-        }
-
-        function processDirectAscentAndDescent() {
-            let ultimoA = divisionA[divisionA.length - 1];
-            let primeroB = divisionB[0];
-
-            if (game.team === ultimoA.name) game.relegations++;
-            if (game.team === primeroB.name) game.promotions++;
-
-            swapTeams(ultimoA, primeroB);
-        }
-
-        function swapTeams(teamA, teamB) {
-            let idxA = divisionA.findIndex(t => t.name === teamA.name);
-            let idxB = divisionB.findIndex(t => t.name === teamB.name);
-
-            if (idxA !== -1 && idxB !== -1) {
-                let temp = divisionA[idxA];
-                divisionA[idxA] = divisionB[idxB];
-                divisionB[idxB] = temp;
-            }
-        }
-
-        function checkSupercup() {
-            document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Final de Temporada`;
-            document.getElementById('event-title').innerText = `Supercopa - ${leagueChampion} vs ${cupChampion}`;
-
-            const container = document.getElementById('choices-container');
-            container.innerHTML = '';
-
-            let playerIsEligible = (game.team === leagueChampion || game.team === cupChampion);
-
-            if (playerIsEligible) {
-                document.getElementById('event-desc').innerText = `¡Tu equipo jugará la Supercopa por haber ganado un título esta temporada!`;
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.innerText = 'Jugar Supercopa';
-                btn.onclick = () => playSupercup();
-                container.appendChild(btn);
-            } else {
-                let won = Math.random() < 0.5;
-                supercupChampion = won ? leagueChampion : cupChampion;
-                document.getElementById('event-desc').innerText = `Tu equipo no clasificó a la Supercopa.\nCampeón de Liga: ${leagueChampion}\nCampeón de Copa: ${cupChampion}\nGanador de la Supercopa: ${supercupChampion}`;
-                
-                const btn = document.createElement('button');
-                btn.className = 'choice-btn';
-                btn.innerText = 'Avanzar a la Siguiente Temporada';
-                btn.onclick = () => advanceSeason();
-                container.appendChild(btn);
-            }
-        }
-
-        function playSupercup() {
-            let opponent = (game.team === leagueChampion) ? cupChampion : leagueChampion;
-            if (opponent === game.team) {
-                opponent = getAllTeams().filter(t => t !== game.team)[0];
-            }
-
-            let won = Math.random() < (game.skill / 100);
-            game.matchesPlayed++;
-
-            if (won) {
-                supercupChampion = game.team;
+            supercupChampion = Math.random() < 0.5 ? divAChampion : cupChampion;
+            if (supercupChampion === game.team) {
                 game.supercups++;
-                let myTeamGoals = Math.floor(Math.random() * 3) + 1;
-                let desiredGoals = calculateMatchGoals();
-                let scGoals = Math.min(myTeamGoals, desiredGoals);
-                game.goals += scGoals;
-                document.getElementById('event-desc').innerText = `¡CAMPEÓN DE LA SUPERCOPA! Derrotaste a ${opponent} (${scGoals} goles).`;
-            } else {
-                supercupChampion = opponent;
-                document.getElementById('event-desc').innerText = `Perdiste la Supercopa frente a ${opponent}.`;
             }
 
-            updateUI();
-
-            const container = document.getElementById('choices-container');
-            container.innerHTML = '';
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
-            btn.innerText = 'Finalizar Temporada';
-            btn.onclick = () => advanceSeason();
-            container.appendChild(btn);
-        }
-
-        function advanceSeason() {
-            championsHistory.push({
+            championsHistory.unshift({
                 season: game.season,
                 age: game.age,
-                liga: leagueChampion,
+                liga: divAChampion,
                 copa: cupChampion,
                 supercopa: supercupChampion
             });
 
-            if (game.age >= 15) {
-                game.isRetired = true;
-                document.getElementById('week-display').innerText = `Fin de Carrera Juvenil`;
-                document.getElementById('event-title').innerText = "Fin de la Carrera (15 Años)";
-                document.getElementById('event-desc').innerText = `Has completado tu etapa futbolística a los 15 años.\n\n¡Revisa tu Palmarés e Historial para ver todos tus títulos, goles e historial completo!`;
-                document.getElementById('choices-container').innerHTML = '';
-                return;
-            }
+            // Promociones / Ascensos / Descensos
+            let divALast = divisionA[divisionA.length - 1];
+            let divBFirst = divisionB[0];
+
+            divisionA = divisionA.filter(t => t.name !== divALast.name);
+            divisionB = divisionB.filter(t => t.name !== divBFirst.name);
+
+            divisionA.push(divBFirst);
+            divisionB.push(divALast);
+
+            if (divBFirst.name === game.team) game.promotions++;
+            if (divALast.name === game.team) game.relegations++;
 
             game.season++;
             game.age++;
             game.matchCount = 0;
+
+            if (game.age > 40) {
+                game.isRetired = true;
+                document.getElementById('event-title').innerText = "🏁 Fin de la Carrera Profesional";
+                document.getElementById('event-desc').innerText = `¡Te has retirado del fútbol a los ${game.age} años!\nRevisa tu palmarés para ver todos tus logros obtenidos.`;
+                document.getElementById('choices-container').innerHTML = '';
+                return;
+            }
+
             resetSeasonPoints();
 
-            loadFreeAgentEvent();
+            document.getElementById('event-title').innerText = `Fin de la Temporada ${game.season - 1}`;
+            document.getElementById('event-desc').innerText = `Campeón Primera A: ${divAChampion}\nCampeón Copa: ${cupChampion}\nAscendió a Primera A: ${divBFirst.name}\nDescendió a Primera B: ${divALast.name}`;
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn primary-option';
+            btn.innerText = 'Avanzar a la Siguiente Temporada';
+            btn.onclick = () => loadFreeAgentEvent();
+            container.appendChild(btn);
         }
 
         window.onload = () => {
