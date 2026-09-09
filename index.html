@@ -127,6 +127,7 @@
             line-height: 1.4;
             margin-bottom: 15px;
             color: #e2e8f0;
+            white-space: pre-line;
         }
 
         .choices-container {
@@ -150,15 +151,6 @@
         button.choice-btn:hover, .form-btn:hover {
             background-color: #475569;
             transform: translateY(-1px);
-        }
-
-        button.btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        button.btn-danger:hover {
-            background-color: var(--danger-hover);
         }
 
         .form-group {
@@ -193,58 +185,8 @@
 
         .week-counter {
             font-size: 0.8rem;
-            color: #f8fafc;
+            color: var(--info-color);
             font-weight: bold;
-        }
-
-        .table-container {
-            margin-top: 15px;
-            background-color: #0f172a;
-            border-radius: 8px;
-            padding: 10px;
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 5px 6px;
-            border-bottom: 1px solid #334155;
-        }
-
-        th {
-            color: var(--warning-color);
-            font-size: 0.75rem;
-        }
-
-        .highlight-row {
-            background-color: rgba(34, 197, 94, 0.25) !important;
-            font-weight: bold;
-        }
-
-        .row-promoted, .row-champ { background-color: rgba(34, 197, 94, 0.1); }
-        .row-promo { background-color: rgba(245, 158, 11, 0.1); }
-        .row-relegated { background-color: rgba(239, 68, 68, 0.1); }
-
-        .career-actions {
-            margin-top: 12px;
-            padding-top: 8px;
-            border-top: 1px dashed #475569;
-            display: flex;
-            gap: 8px;
-        }
-
-        .career-actions button {
-            flex: 1;
-            font-size: 0.75rem;
-            padding: 6px;
-            text-align: center;
         }
 
         .modal-overlay {
@@ -307,7 +249,7 @@
 
         <div class="main-content">
             <div>
-                <div class="week-counter" id="week-display" style="margin-bottom: 5px; color: var(--info-color);">Configuración</div>
+                <div class="week-counter" id="week-display" style="margin-bottom: 5px;">Configuración</div>
                 <div class="event-title" id="event-title">Creación de Jugador</div>
                 <div class="event-description" id="event-desc">Personaliza tu ficha de carrera.</div>
             </div>
@@ -315,7 +257,6 @@
             <div class="choices-container" id="choices-container"></div>
         </div>
 
-        <!-- MODAL PALMARÉS -->
         <div id="palmares-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3>🏆 Palmarés Personal</h3>
@@ -333,7 +274,6 @@
             </div>
         </div>
 
-        <!-- MODAL HISTORIAL DE CAMPEONES -->
         <div id="history-modal" class="modal-overlay hidden">
             <div class="modal-content">
                 <h3>📜 Historial de Campeones</h3>
@@ -364,7 +304,7 @@
         };
 
         let divisionA = [], divisionB = [];
-        let leagueChampion = null, cupChampion = null;
+        let leagueChampion = null, cupChampion = null, supercupChampion = null;
         let cupTeams = [], cupStage = 0, cupPlayerEliminated = false;
         let championsHistory = [];
         let currentRival = "";
@@ -383,6 +323,9 @@
             sortTables();
             cupStage = 0;
             cupPlayerEliminated = false;
+            leagueChampion = null;
+            cupChampion = null;
+            supercupChampion = null;
         }
 
         function sortTables() {
@@ -398,6 +341,15 @@
             if (divisionA.some(t => t.name === game.team)) return "Primera A";
             if (divisionB.some(t => t.name === game.team)) return "Primera B";
             return "Agente Libre";
+        }
+
+        function updateUI() {
+            document.getElementById('player-name').innerText = game.name || "Jugador";
+            document.getElementById('player-details').innerText = `${game.team} (${getCurrentDivision()})`;
+            document.getElementById('stat-age').innerText = game.age;
+            document.getElementById('stat-energy').innerText = `${game.energy}/${game.maxEnergy}`;
+            document.getElementById('stat-skill').innerText = game.skill;
+            document.getElementById('stat-fame').innerText = game.fame;
         }
 
         function toggleModal(id) {
@@ -474,28 +426,68 @@
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = `Fichar por ${club} (${div})`;
-                btn.onclick = () => { game.team = club; startSeasonLoop(); };
+                btn.onclick = () => { game.team = club; updateUI(); startSeasonLoop(); };
                 container.appendChild(btn);
             });
         }
 
-        function initCup() {
-            let tA = [...divisionA.map(t => t.name)].sort(() => 0.5 - Math.random()).slice(0, 5);
-            let tB = [...divisionB.map(t => t.name)].sort(() => 0.5 - Math.random()).slice(0, 5);
-            if (game.team !== "Sin Equipo" && !tA.includes(game.team) && !tB.includes(game.team)) {
-                if (getCurrentDivision() === "Primera A") tA[0] = game.team; else tB[0] = game.team;
+        function playCupRound() {
+            document.getElementById('week-display').innerText = `Temp. ${game.season} | Copa Nacional`;
+            document.getElementById('event-title').innerText = `Copa Nacional - Etapa ${cupStage}`;
+            
+            let currentOpponent = getAllTeams().filter(t => t !== game.team)[Math.floor(Math.random() * getAllTeams().length)];
+            let playerWon = Math.random() < (game.skill / 100);
+            
+            if (playerWon) {
+                game.goals += Math.floor(Math.random() * 2) + 1;
+                game.matchesPlayed++;
+                if (cupStage < 3) {
+                    cupStage++;
+                    document.getElementById('event-desc').innerText = `¡Ganaste el partido contra ${currentOpponent}! Avanzas a la siguiente ronda de Copa.`;
+                    const container = document.getElementById('choices-container');
+                    container.innerHTML = '';
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn';
+                    btn.innerText = 'Continuar en la Copa';
+                    btn.onclick = () => playCupRound();
+                    container.appendChild(btn);
+                } else {
+                    cupChampion = game.team;
+                    game.cups++;
+                    document.getElementById('event-desc').innerText = `¡Felicitaciones! ¡Ganaste la Copa Nacional derrotando a ${currentOpponent}!`;
+                    endCupPhase();
+                }
+            } else {
+                cupPlayerEliminated = true;
+                cupChampion = currentOpponent;
+                document.getElementById('event-desc').innerText = `Fuiste eliminado de la Copa Nacional ante ${currentOpponent}. La copa fue ganada por ${cupChampion}.`;
+                endCupPhase();
             }
-            cupTeams = [...tA, ...tB].sort(() => 0.5 - Math.random());
-            cupStage = 1;
+            updateUI();
+        }
+
+        function endCupPhase() {
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerText = 'Volver a la Liga';
+            btn.onclick = () => startSeasonLoop();
+            container.appendChild(btn);
         }
 
         function startSeasonLoop() {
             if (game.isRetired) return;
             if (game.team === "Sin Equipo") return loadFreeAgentEvent();
 
-            if (game.matchCount === 4 && cupStage === 0) {
-                initCup();
+            if (game.matchCount === 4 && cupStage === 0 && !cupPlayerEliminated) {
+                cupStage = 1;
                 playCupRound();
+                return;
+            }
+
+            if (game.matchCount >= TOTAL_LEAGUE_MATCHES) {
+                finishSeason();
                 return;
             }
 
@@ -503,25 +495,175 @@
             let currentDivName = getCurrentDivision();
             let currentTable = currentDivName === "Primera A" ? divisionA : divisionB;
 
-            if (game.matchCount <= TOTAL_LEAGUE_MATCHES) {
-                let opponents = currentTable.filter(t => t.name !== game.team).map(t => t.name);
-                currentRival = opponents[Math.floor(Math.random() * opponents.length)];
+            let opponents = currentTable.filter(t => t.name !== game.team).map(t => t.name);
+            currentRival = opponents[Math.floor(Math.random() * opponents.length)];
 
-                document.getElementById('week-display').innerText = `Temp. ${game.season} | ${currentDivName}`;
-                document.getElementById('event-title').innerText = `Fecha ${game.matchCount}: ${game.team} vs ${currentRival}`;
-                document.getElementById('event-desc').innerText = `Rival: ${currentRival}\nNivel: ${game.skill} | Energía: ${game.energy}/${game.maxEnergy}. Preparación:`;
+            document.getElementById('week-display').innerText = `Temp. ${game.season} | ${currentDivName}`;
+            document.getElementById('event-title').innerText = `Fecha ${game.matchCount}: ${game.team} vs ${currentRival}`;
+            document.getElementById('event-desc').innerText = `Rival: ${currentRival}\nNivel: ${game.skill} | Energía: ${game.energy}/${game.maxEnergy}. Preparación:`;
 
-                const container = document.getElementById('choices-container');
-                container.innerHTML = '';
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
 
-                let energyCost = game.age >= 32 ? 30 : 25;
-                let gainSkill = game.age >= 33 ? 1 : 2;
+            let energyCost = game.age >= 32 ? 30 : 25;
+            let gainSkill = game.age >= 33 ? 1 : 2;
 
-                const choices = [
-                    { text: `Entrenar Fuerte (-${energyCost} Energ, +${gainSkill} Nivel)`, act: () => { game.energy -= energyCost; game.skill += gainSkill; checkForIncident(currentRival); } },
-                    { text: "Entrenamiento Moderado (+10 Energ, +1 Nivel)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 10); game.skill += 1; checkForIncident(currentRival); } },
-                    { text: "Descansar (+25 Energ)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 25); checkForIncident(currentRival); } }
-                ];
+            const choices = [
+                { text: `Entrenar Fuerte (-${energyCost} Energ, +${gainSkill} Nivel)`, act: () => { game.energy = Math.max(0, game.energy - energyCost); game.skill += gainSkill; playMatch(); } },
+                { text: "Entrenamiento Moderado (+10 Energ, +1 Nivel)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 10); game.skill += 1; playMatch(); } },
+                { text: "Descansar (+25 Energ)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 25); playMatch(); } }
+            ];
 
-                choices.forEach(c => {
-                    const btn = document.createElemen
+            choices.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = c.text;
+                btn.onclick = c.act;
+                container.appendChild(btn);
+            });
+            updateUI();
+        }
+
+        function playMatch() {
+            let myScore = Math.floor(Math.random() * (game.skill / 20 + 1));
+            let rivalScore = Math.floor(Math.random() * 3);
+
+            let myTeamObj = getCurrentDivision() === "Primera A" 
+                ? divisionA.find(t => t.name === game.team) 
+                : divisionB.find(t => t.name === game.team);
+
+            let rivalTeamObj = getCurrentDivision() === "Primera A"
+                ? divisionA.find(t => t.name === currentRival)
+                : divisionB.find(t => t.name === currentRival);
+
+            game.matchesPlayed++;
+            if (myScore > rivalScore) {
+                game.wins++;
+                if (myTeamObj) myTeamObj.pts += 3;
+            } else if (myScore === rivalScore) {
+                game.draws++;
+                if (myTeamObj) myTeamObj.pts += 1;
+                if (rivalTeamObj) rivalTeamObj.pts += 1;
+            } else {
+                game.losses++;
+                if (rivalTeamObj) rivalTeamObj.pts += 3;
+            }
+
+            let goalsScored = Math.min(myScore, Math.floor(Math.random() * 2) + (myScore > 0 ? 1 : 0));
+            game.goals += goalsScored;
+
+            sortTables();
+            updateUI();
+
+            document.getElementById('event-title').innerText = `Resultado: ${game.team} ${myScore} - ${rivalScore} ${currentRival}`;
+            document.getElementById('event-desc').innerText = `Anotaste ${goalsScored} gol(es) en este encuentro.`;
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerText = 'Continuar';
+            btn.onclick = () => startSeasonLoop();
+            container.appendChild(btn);
+        }
+
+        function finishSeason() {
+            leagueChampion = divisionA[0].name;
+            if (leagueChampion === game.team) {
+                game.titles++;
+            }
+
+            if (!cupChampion) {
+                cupChampion = getAllTeams()[Math.floor(Math.random() * getAllTeams().length)];
+            }
+
+            checkSupercup();
+        }
+
+        function checkSupercup() {
+            document.getElementById('week-display').innerText = `Temp. ${game.season} | Final de Temporada`;
+            document.getElementById('event-title').innerText = `Supercopa - ${leagueChampion} vs ${cupChampion}`;
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+
+            let playerIsEligible = (game.team === leagueChampion || game.team === cupChampion);
+
+            if (playerIsEligible) {
+                document.getElementById('event-desc').innerText = `¡Tu equipo jugará la Supercopa por haber ganado un título esta temporada!`;
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = 'Jugar Supercopa';
+                btn.onclick = () => playSupercup();
+                container.appendChild(btn);
+            } else {
+                let won = Math.random() < 0.5;
+                supercupChampion = won ? leagueChampion : cupChampion;
+                document.getElementById('event-desc').innerText = `Tu equipo no clasificó a la Supercopa.\nCampeón de Liga: ${leagueChampion}\nCampeón de Copa: ${cupChampion}\nGanador de la Supercopa: ${supercupChampion}`;
+                
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = 'Avanzar a la Siguiente Temporada';
+                btn.onclick = () => advanceSeason();
+                container.appendChild(btn);
+            }
+        }
+
+        function playSupercup() {
+            let opponent = (game.team === leagueChampion) ? cupChampion : leagueChampion;
+            if (opponent === game.team) {
+                opponent = getAllTeams().filter(t => t !== game.team)[0];
+            }
+
+            let won = Math.random() < (game.skill / 100);
+            game.matchesPlayed++;
+
+            if (won) {
+                supercupChampion = game.team;
+                game.supercups++;
+                game.goals += 1;
+                document.getElementById('event-desc').innerText = `¡CAMPEÓN DE LA SUPERCOPA! Derrotaste a ${opponent}.`;
+            } else {
+                supercupChampion = opponent;
+                document.getElementById('event-desc').innerText = `Perdiste la Supercopa frente a ${opponent}.`;
+            }
+
+            updateUI();
+
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerText = 'Finalizar Temporada';
+            btn.onclick = () => advanceSeason();
+            container.appendChild(btn);
+        }
+
+        function advanceSeason() {
+            championsHistory.push({
+                season: game.season,
+                liga: leagueChampion,
+                copa: cupChampion,
+                supercopa: supercupChampion
+            });
+
+            game.season++;
+            game.age++;
+            game.matchCount = 0;
+            resetSeasonPoints();
+
+            if (game.age >= 38) {
+                game.isRetired = true;
+                document.getElementById('event-title').innerText = "Fin de la Carrera";
+                document.getElementById('event-desc').innerText = `Te has retirado del fútbol profesional a los ${game.age} años. ¡Revisa tu Palmarés e Historial para ver tus logros!`;
+                document.getElementById('choices-container').innerHTML = '';
+                return;
+            }
+
+            loadFreeAgentEvent();
+        }
+
+        window.onload = () => loadCreationScreen();
+    </script>
+</body>
+</html>
