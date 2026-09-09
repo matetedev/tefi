@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Fútbol - Liga de Grupos, Copa y Supercopa</title>
+    <title>Simulador de Fútbol - Liga Única (Grupo A y B)</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -11,12 +11,8 @@
             --text-color: #f8fafc;
             --accent-color: #22c55e;
             --accent-hover: #16a34a;
-            --danger-color: #ef4444;
-            --danger-hover: #dc2626;
             --warning-color: #f59e0b;
             --info-color: #3b82f6;
-            --cup-color: #a855f7;
-            --cafecito-color: #00c9a7;
         }
 
         body {
@@ -102,21 +98,11 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            transition: all 0.2s;
-        }
-
-        .btn-cafecito:hover {
-            background-color: #ffdd00;
-            color: #020617;
         }
 
         .btn-transfer {
             background-color: var(--info-color);
             color: #ffffff;
-        }
-
-        .btn-transfer:hover {
-            background-color: #2563eb;
         }
 
         .stats-bar {
@@ -179,22 +165,16 @@
             cursor: pointer;
             font-size: 0.9rem;
             text-align: left;
-            transition: background-color 0.2s, transform 0.1s;
         }
 
         button.choice-btn:hover, .form-btn:hover {
             background-color: #475569;
-            transform: translateY(-1px);
         }
 
         button.choice-btn.primary-option {
             background-color: #15803d;
             border: 1px solid var(--accent-color);
             font-weight: bold;
-        }
-
-        button.choice-btn.primary-option:hover {
-            background-color: var(--accent-hover);
         }
 
         .form-group {
@@ -235,14 +215,9 @@
 
         .modal-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(2, 6, 23, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             z-index: 10;
         }
 
@@ -251,18 +226,12 @@
             border: 1px solid #334155;
             border-radius: 10px;
             padding: 18px;
-            width: 88%;
-            max-width: 480px;
-            max-height: 85%;
+            width: 88%; max-width: 480px; max-height: 85%;
             overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .modal-content h3 {
-            margin-top: 0;
-            color: var(--warning-color);
-            text-align: center;
-            font-size: 1.1rem;
+            margin-top: 0; color: var(--warning-color); text-align: center; font-size: 1.1rem;
         }
 
         .history-list { font-size: 0.8rem; line-height: 1.6; }
@@ -271,30 +240,17 @@
 
         .table-section { margin-bottom: 16px; }
         .table-section h4 {
-            margin: 0 0 6px 0;
-            color: var(--info-color);
-            font-size: 0.9rem;
-            border-bottom: 1px solid #334155;
-            padding-bottom: 4px;
+            margin: 0 0 6px 0; color: var(--info-color); font-size: 0.9rem;
+            border-bottom: 1px solid #334155; padding-bottom: 4px;
         }
         .standings-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-            text-align: left;
+            width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left;
         }
-        .standings-table th, .standings-table td {
-            padding: 5px 8px;
-            border-bottom: 1px solid #1e293b;
-        }
-        .standings-table th {
-            color: #94a3b8;
-            background-color: #0f172a;
-        }
+        .standings-table th, .standings-table td { padding: 5px 8px; border-bottom: 1px solid #1e293b; }
+        .standings-table th { color: #94a3b8; background-color: #0f172a; }
         .player-team-row {
             background-color: rgba(34, 197, 94, 0.15) !important;
-            font-weight: bold;
-            color: var(--accent-color);
+            font-weight: bold; color: var(--accent-color);
         }
         .finalist-row { color: var(--warning-color); font-weight: bold; }
     </style>
@@ -305,10 +261,10 @@
         <header>
             <div class="player-info">
                 <h2 id="player-name">Jugador</h2>
-                <p id="player-details">Agente Libre</p>
+                <p id="player-details">Primera División</p>
             </div>
             <div class="header-actions">
-                <button class="btn-modal btn-transfer" id="btn-change-club" onclick="requestClubChange()">🔄 Cambiar Club</button>
+                <button class="btn-modal btn-transfer" onclick="requestClubChange()">🔄 Cambiar Club</button>
                 <button class="btn-modal" onclick="toggleModal('tables-modal')">📊 Tablas</button>
                 <button class="btn-modal" onclick="toggleModal('history-modal')">📜 Historial</button>
                 <button class="btn-modal" onclick="toggleModal('palmares-modal')">🏆 Palmarés</button>
@@ -325,7 +281,7 @@
 
         <div class="main-content">
             <div>
-                <div class="week-counter" id="week-display" style="margin-bottom: 5px;">Configuración</div>
+                <div class="week-counter" id="week-display">Configuración</div>
                 <div class="event-title" id="event-title">Creación de Jugador</div>
                 <div class="event-description" id="event-desc">Personaliza tu ficha de carrera.</div>
             </div>
@@ -333,36 +289,26 @@
             <div class="choices-container" id="choices-container"></div>
         </div>
 
-        <!-- MODAL TABLAS DE POSICIONES -->
+        <!-- MODAL TABLAS -->
         <div id="tables-modal" class="modal-overlay hidden">
             <div class="modal-content">
-                <h3>📊 Tablas de Posiciones</h3>
+                <h3>📊 Primera División - Tablas</h3>
                 
                 <div class="table-section">
-                    <h4>Grupo A (Puntero a la Final)</h4>
+                    <h4>Grupo A (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Equipo</th>
-                                <th style="text-align:center;">PJ</th>
-                                <th style="text-align:center;">PTS</th>
-                            </tr>
+                            <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
                         </thead>
                         <tbody id="table-group-a"></tbody>
                     </table>
                 </div>
 
                 <div class="table-section">
-                    <h4>Grupo B (Puntero a la Final)</h4>
+                    <h4>Grupo B (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Equipo</th>
-                                <th style="text-align:center;">PJ</th>
-                                <th style="text-align:center;">PTS</th>
-                            </tr>
+                            <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
                         </thead>
                         <tbody id="table-group-b"></tbody>
                     </table>
@@ -377,12 +323,12 @@
             <div class="modal-content">
                 <h3>🏆 Palmarés Personal</h3>
                 <div style="font-size: 0.85rem; line-height: 1.8;">
-                    <p style="margin:4px 0;">🥇 <b>Títulos de Liga:</b> <span id="palmares-titles">0</span></p>
-                    <p style="margin:4px 0;">🍷 <b>Copas Nacionales:</b> <span id="palmares-cups">0</span></p>
-                    <p style="margin:4px 0;">⚡ <b>Supercopas:</b> <span id="palmares-supercups">0</span></p>
-                    <hr style="border-color: #334155; margin: 8px 0;">
-                    <p style="margin:4px 0;">🎯 <b>Goles Totales:</b> <span id="palmares-goals">0</span></p>
-                    <p style="margin:4px 0;">🎮 <b>Partidos Jugados:</b> <span id="palmares-matches">0</span></p>
+                    <p>🥇 <b>Títulos de Liga:</b> <span id="palmares-titles">0</span></p>
+                    <p>🍷 <b>Copas Nacionales:</b> <span id="palmares-cups">0</span></p>
+                    <p>⚡ <b>Supercopas:</b> <span id="palmares-supercups">0</span></p>
+                    <hr style="border-color: #334155;">
+                    <p>🎯 <b>Goles Totales:</b> <span id="palmares-goals">0</span></p>
+                    <p>🎮 <b>Partidos Jugados:</b> <span id="palmares-matches">0</span></p>
                 </div>
                 <button class="form-btn" style="width: 100%; margin-top: 12px;" onclick="toggleModal('palmares-modal')">Cerrar</button>
             </div>
@@ -393,7 +339,7 @@
             <div class="modal-content">
                 <h3>📜 Historial de Campeones</h3>
                 <div class="history-list" id="history-container">
-                    <p style="text-align:center; color:#94a3b8;">Aún no se ha completado ninguna temporada.</p>
+                    <p style="text-align:center; color:#94a3b8;">Aún no hay campeones registrados.</p>
                 </div>
                 <button class="form-btn" style="width: 100%; margin-top: 12px;" onclick="toggleModal('history-modal')">Cerrar</button>
             </div>
@@ -414,13 +360,14 @@
         let game = {
             name: "", nationality: "", position: "Delantero", number: "", team: "Sin Equipo",
             age: 7, maxEnergy: 100, energy: 100, skill: 45, fame: 5, season: 1,
-            matchCount: 0, goals: 0, matchesPlayed: 0, wins: 0, draws: 0, losses: 0, points: 0,
+            matchCount: 0, goals: 0, matchesPlayed: 0, wins: 0, draws: 0, losses: 0,
             titles: 0, cups: 0, supercups: 0, isRetired: false
         };
 
         let groupA = [], groupB = [];
         let leagueChampion = null, cupChampion = null, supercupChampion = null;
         let cupStage = 0, cupPlayerEliminated = false;
+        let cupEliminatedByPlayer = []; // Equipos eliminados directamente por el jugador en la copa
         let championsHistory = [];
         let currentRival = "";
 
@@ -429,17 +376,10 @@
         function calculateMatchGoals() {
             let rand = Math.random();
             switch (game.position) {
-                case "Arquero":
-                    return rand < (1 / 26) ? 1 : 0;
-                case "Defensor":
-                    if (rand < 0.15) return 1;
-                    return 0;
-                case "Mediocampista":
-                    if (rand < 0.35) return 1;
-                    if (rand < 0.45) return 2;
-                    return 0;
-                case "Delantero":
-                default:
+                case "Arquero": return rand < (1 / 26) ? 1 : 0;
+                case "Defensor": return rand < 0.15 ? 1 : 0;
+                case "Mediocampista": return rand < 0.35 ? 1 : (rand < 0.45 ? 2 : 0);
+                case "Delantero": default:
                     if (rand < 0.35) return 1;
                     if (rand < 0.55) return 2;
                     if (rand < 0.65) return 3;
@@ -459,6 +399,7 @@
             sortTables();
             cupStage = 0;
             cupPlayerEliminated = false;
+            cupEliminatedByPlayer = [];
             leagueChampion = null;
             cupChampion = null;
             supercupChampion = null;
@@ -476,7 +417,7 @@
         function getCurrentGroup() {
             if (groupA.some(t => t.name === game.team)) return "Grupo A";
             if (groupB.some(t => t.name === game.team)) return "Grupo B";
-            return "Agente Libre";
+            return "Sin Grupo";
         }
 
         function updateUI() {
@@ -507,7 +448,7 @@
                 return `
                     <tr class="${rowClass}">
                         <td>${index + 1}</td>
-                        <td>${t.name} ${index === 0 ? '⭐' : ''}</td>
+                        <td>${t.name} ${index === 0 ? '👑' : ''}</td>
                         <td style="text-align:center;">${t.pj}</td>
                         <td style="text-align:center;"><b>${t.pts}</b></td>
                     </tr>
@@ -534,8 +475,8 @@
             }
             container.innerHTML = championsHistory.map(h => `
                 <div class="history-item">
-                    <b style="color:var(--warning-color);">Temporada ${h.season} (Edad ${h.age || '-'})</b><br>
-                    🏆 <b>Campeón de Liga:</b> ${h.liga}<br>
+                    <b style="color:var(--warning-color);">Temporada ${h.season} (Edad ${h.age})</b><br>
+                    🏆 <b>Liga:</b> ${h.liga}<br>
                     🍷 <b>Copa Nacional:</b> ${h.copa}<br>
                     ⚡ <b>Supercopa:</b> ${h.supercopa}
                 </div>
@@ -544,10 +485,10 @@
 
         function requestClubChange() {
             if (game.isRetired || game.team === "Sin Equipo") return;
-            
+
             document.getElementById('week-display').innerText = `Mercado Abierto`;
-            document.getElementById('event-title').innerText = "Solicitar Transferencia de Club";
-            document.getElementById('event-desc').innerText = `Tu club actual es ${game.team}. Elige a qué equipo deseas transferirte inmediatamente:`;
+            document.getElementById('event-title').innerText = "Transferencia de Club";
+            document.getElementById('event-desc').innerText = `Selecciona tu nuevo club dentro de la Primera División:`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
@@ -559,17 +500,13 @@
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
                 btn.innerText = `Fichar por ${club} (${grp})`;
-                btn.onclick = () => {
-                    game.team = club;
-                    updateUI();
-                    startSeasonLoop();
-                };
+                btn.onclick = () => { game.team = club; updateUI(); startSeasonLoop(); };
                 container.appendChild(btn);
             });
 
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'choice-btn primary-option';
-            cancelBtn.innerText = `↩ Cancelar y seguir en ${game.team}`;
+            cancelBtn.innerText = `↩ Permanecer en ${game.team}`;
             cancelBtn.onclick = () => startSeasonLoop();
             container.appendChild(cancelBtn);
         }
@@ -608,7 +545,7 @@
         }
 
         function loadFreeAgentEvent() {
-            document.getElementById('event-title').innerText = "Mercado de Pases / Renovación";
+            document.getElementById('event-title').innerText = "Mercado de Pases";
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
 
@@ -616,15 +553,15 @@
 
             if (hasCurrentTeam) {
                 let currentGroup = getCurrentGroup();
-                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}.\n¿Deseas renovar tu contrato con ${game.team} o explorar nuevas ofertas?`;
+                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}.\n¿Quieres seguir en ${game.team} (${currentGroup}) o cambiar de equipo?`;
                 
                 const stayBtn = document.createElement('button');
                 stayBtn.className = 'choice-btn primary-option';
-                stayBtn.innerText = `⚽ Renovar y continuar en ${game.team} (${currentGroup})`;
+                stayBtn.innerText = `⚽ Continuar en ${game.team}`;
                 stayBtn.onclick = () => { updateUI(); startSeasonLoop(); };
                 container.appendChild(stayBtn);
             } else {
-                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}. Elegí tu club de inicio:`;
+                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}. Elige tu equipo para empezar:`;
             }
 
             let availableTeams = getAllTeams().filter(t => t !== game.team);
@@ -642,12 +579,17 @@
 
         function playCupRound() {
             document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Copa Nacional`;
-            document.getElementById('event-title').innerText = `Copa Nacional - Etapa ${cupStage}`;
+            document.getElementById('event-title').innerText = `Copa Nacional - Ronda ${cupStage}`;
             
-            let currentOpponent = getAllTeams().filter(t => t !== game.team)[Math.floor(Math.random() * getAllTeams().length)];
+            // Elegir rival entre los equipos que el jugador aún no eliminó ni su propio equipo
+            let candidates = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
+            let currentOpponent = candidates[Math.floor(Math.random() * candidates.length)];
+            
             let playerWon = Math.random() < (game.skill / 100);
             
             if (playerWon) {
+                cupEliminatedByPlayer.push(currentOpponent); // Se guarda el rival como eliminado por el jugador
+                
                 let myTeamGoals = Math.floor(Math.random() * 3) + 1;
                 let desiredGoals = calculateMatchGoals();
                 let cupGoals = Math.min(myTeamGoals, desiredGoals);
@@ -656,24 +598,31 @@
                 game.matchesPlayed++;
                 if (cupStage < 3) {
                     cupStage++;
-                    document.getElementById('event-desc').innerText = `¡Ganaste el partido contra ${currentOpponent}! Anotaste ${cupGoals} gol(es). Avanzas a la siguiente ronda de Copa.`;
+                    document.getElementById('event-desc').innerText = `¡Victoria contra ${currentOpponent}! Anotaste ${cupGoals} gol(es). Clasificas a la siguiente ronda.`;
                     const container = document.getElementById('choices-container');
                     container.innerHTML = '';
                     const btn = document.createElement('button');
                     btn.className = 'choice-btn';
-                    btn.innerText = 'Continuar en la Copa';
+                    btn.innerText = 'Siguiente Ronda de Copa';
                     btn.onclick = () => playCupRound();
                     container.appendChild(btn);
                 } else {
                     cupChampion = game.team;
                     game.cups++;
-                    document.getElementById('event-desc').innerText = `¡Felicitaciones! ¡Ganaste la Copa Nacional derrotando a ${currentOpponent}! Anotaste ${cupGoals} gol(es) en la final.`;
+                    document.getElementById('event-desc').innerText = `🏆 ¡CAMPEONES DE LA COPA NACIONAL! Venciste a ${currentOpponent} anotando ${cupGoals} gol(es) en la final.`;
                     endCupPhase();
                 }
             } else {
                 cupPlayerEliminated = true;
-                cupChampion = currentOpponent;
-                document.getElementById('event-desc').innerText = `Fuiste eliminado de la Copa Nacional ante ${currentOpponent}. La copa fue ganada por ${cupChampion}.`;
+                
+                // Filtramos la lista de posibles campeones:
+                // EXCLUIMOS al equipo del jugador y a TODOS los equipos que el jugador eliminó previamente
+                let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
+                
+                // Seleccionamos al azar el campeón únicamente de ese grupo de sobrevivientes
+                cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
+                
+                document.getElementById('event-desc').innerText = `Quedaste eliminado ante ${currentOpponent}.\n\nTras el desarrollo del torneo, el campeón de la Copa fue ${cupChampion}.`;
                 endCupPhase();
             }
             updateUI();
@@ -684,7 +633,7 @@
             container.innerHTML = '';
             const btn = document.createElement('button');
             btn.className = 'choice-btn';
-            btn.innerText = 'Volver a la Liga';
+            btn.innerText = 'Volver al Torneo de Liga';
             btn.onclick = () => startSeasonLoop();
             container.appendChild(btn);
         }
@@ -711,18 +660,15 @@
             let opponents = currentTable.filter(t => t.name !== game.team).map(t => t.name);
             currentRival = opponents[Math.floor(Math.random() * opponents.length)];
 
-            document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | ${currentGroup}`;
-            document.getElementById('event-title').innerText = `Fecha ${game.matchCount}: ${game.team} vs ${currentRival}`;
-            document.getElementById('event-desc').innerText = `Rival: ${currentRival}\nNivel: ${game.skill} | Energía: ${game.energy}/${game.maxEnergy}. Preparación:`;
+            document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Fecha ${game.matchCount}`;
+            document.getElementById('event-title').innerText = `${game.team} vs ${currentRival} (${currentGroup})`;
+            document.getElementById('event-desc').innerText = `Nivel: ${game.skill} | Energía: ${game.energy}/${game.maxEnergy}. Elige plan de partido:`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
 
-            let energyCost = 25;
-            let gainSkill = 2;
-
             const choices = [
-                { text: `Entrenar Fuerte (-${energyCost} Energ, +${gainSkill} Nivel)`, act: () => { game.energy = Math.max(0, game.energy - energyCost); game.skill += gainSkill; playMatch(); } },
+                { text: `Entrenar Fuerte (-25 Energ, +2 Nivel)`, act: () => { game.energy = Math.max(0, game.energy - 25); game.skill += 2; playMatch(); } },
                 { text: "Entrenamiento Moderado (+10 Energ, +1 Nivel)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 10); game.skill += 1; playMatch(); } },
                 { text: "Descansar (+25 Energ)", act: () => { game.energy = Math.min(game.maxEnergy, game.energy + 25); playMatch(); } }
             ];
@@ -764,14 +710,9 @@
                     let homeGoals = Math.floor(Math.random() * 4);
                     let awayGoals = Math.floor(Math.random() * 4);
 
-                    if (homeGoals > awayGoals) {
-                        homeObj.pts += 3;
-                    } else if (awayGoals > homeGoals) {
-                        awayObj.pts += 3;
-                    } else {
-                        homeObj.pts += 1;
-                        awayObj.pts += 1;
-                    }
+                    if (homeGoals > awayGoals) homeObj.pts += 3;
+                    else if (awayGoals > homeGoals) awayObj.pts += 3;
+                    else { homeObj.pts += 1; awayObj.pts += 1; }
                 }
             }
         }
@@ -814,8 +755,8 @@
             updateUI();
 
             document.getElementById('event-title').innerText = `Resultado: ${game.team} ${myScore} - ${rivalScore} ${currentRival}`;
-            let goalsText = goalsScored > 0 ? ` ¡Anotaste ${goalsScored} gol(es)!` : '';
-            document.getElementById('event-desc').innerText = `Finalizó el partido.${goalsText}\nPosición de tu equipo en la tabla: ${playerTable.findIndex(t => t.name === game.team) + 1}º.`;
+            let goalsText = goalsScored > 0 ? ` ¡Convertiste ${goalsScored} gol(es)!` : '';
+            document.getElementById('event-desc').innerText = `Finalizó el partido.${goalsText}\nUbicación en la tabla del ${getCurrentGroup()}: ${playerTable.findIndex(t => t.name === game.team) + 1}º puesto.`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
@@ -826,14 +767,13 @@
             container.appendChild(btn);
         }
 
-        // GRAN FINAL ENTRE LOS LÍDERES DE CADA GRUPO
         function playFinalMatch() {
             sortTables();
             let winnerA = groupA[0].name;
             let winnerB = groupB[0].name;
 
-            document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Gran Final de Liga`;
-            document.getElementById('event-title').innerText = `🏆 GRAN FINAL DE LIGA`;
+            document.getElementById('week-display').innerText = `Temp. ${game.season} | Gran Final de Liga`;
+            document.getElementById('event-title').innerText = `🏆 GRAN FINAL: ${winnerA} vs ${winnerB}`;
 
             let isUserInFinal = (winnerA === game.team || winnerB === game.team);
             let rivalFinal = winnerA === game.team ? winnerB : winnerA;
@@ -842,7 +782,6 @@
                 let myScore = Math.floor(Math.random() * (game.skill / 18 + 1)) + 1;
                 let rivalScore = Math.floor(Math.random() * 3);
 
-                // Evitar empates en una final
                 if (myScore === rivalScore) myScore++;
 
                 let desiredGoals = calculateMatchGoals();
@@ -854,15 +793,15 @@
                 if (myScore > rivalScore) {
                     leagueChampion = game.team;
                     game.titles++;
-                    document.getElementById('event-desc').innerText = `¡GANASTE LA GRAN FINAL!\n\n${game.team} ${myScore} - ${rivalScore} ${rivalFinal}\nAnostaste ${goalsScored} gol(es).\n\n🏆 ¡SOMOS CAMPEONES DE LIGA!`;
+                    document.getElementById('event-desc').innerText = `¡GANASTE LA FINAL DE LA LIGA!\n\n${game.team} ${myScore} - ${rivalScore} ${rivalFinal}\nConvertiste ${goalsScored} gol(es).\n\n🏆 ¡SOMOS CAMPEONES!`;
                 } else {
                     leagueChampion = rivalFinal;
-                    document.getElementById('event-desc').innerText = `PERDISTE LA GRAN FINAL.\n\n${game.team} ${myScore} - ${rivalScore} ${rivalFinal}\nAnostaste ${goalsScored} gol(es).\n\nEl campeón es ${rivalFinal}.`;
+                    document.getElementById('event-desc').innerText = `Caíste en la Final de Liga.\n\n${game.team} ${myScore} - ${rivalScore} ${rivalFinal}\nConvertiste ${goalsScored} gol(es).\n\nEl campeón es ${rivalFinal}.`;
                 }
             } else {
-                // Simulación de la final si el usuario no clasificó
                 leagueChampion = Math.random() < 0.5 ? winnerA : winnerB;
-                document.getElementById('event-desc').innerText = `No lograste clasificar a la final.\n\nEn la Gran Final de Liga entre los 1° de cada grupo:\n🏆 ${leagueChampion} derrotó a ${leagueChampion === winnerA ? winnerB : winnerA} y se consagró Campeón de Liga.`;
+                let loserFinal = leagueChampion === winnerA ? winnerB : winnerA;
+                document.getElementById('event-desc').innerText = `No lograste quedar 1° de tu grupo para jugar la final.\n\nEn la Gran Final de la Liga:\n🏆 ${leagueChampion} superó a ${loserFinal} y se coronó Campeón.`;
             }
 
             updateUI();
@@ -878,13 +817,12 @@
 
         function finishSeason() {
             if (!cupChampion) {
-                cupChampion = getAllTeams()[Math.floor(Math.random() * getAllTeams().length)];
+                let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
+                cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
             }
 
             supercupChampion = Math.random() < 0.5 ? leagueChampion : cupChampion;
-            if (supercupChampion === game.team) {
-                game.supercups++;
-            }
+            if (supercupChampion === game.team) game.supercups++;
 
             championsHistory.unshift({
                 season: game.season,
@@ -900,8 +838,8 @@
 
             if (game.age > 40) {
                 game.isRetired = true;
-                document.getElementById('event-title').innerText = "🏁 Fin de la Carrera Profesional";
-                document.getElementById('event-desc').innerText = `¡Te has retirado del fútbol a los ${game.age} años!\nRevisa tu palmarés para ver todos tus logros obtenidos.`;
+                document.getElementById('event-title').innerText = "🏁 Retiro Profesional";
+                document.getElementById('event-desc').innerText = `Te has retirado del fútbol a los ${game.age} años.\nRevisa tu palmarés para ver tus conquistas.`;
                 document.getElementById('choices-container').innerHTML = '';
                 return;
             }
@@ -909,20 +847,18 @@
             resetSeasonPoints();
 
             document.getElementById('event-title').innerText = `Resumen de la Temporada ${game.season - 1}`;
-            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${leagueChampion}\n🍷 Campeón de Copa Nacional: ${cupChampion}\n⚡ Campeón de Supercopa: ${supercupChampion}`;
+            document.getElementById('event-desc').innerText = `🏆 Campeón de Liga: ${leagueChampion}\n🍷 Campeón Copa Nacional: ${cupChampion}\n⚡ Campeón Supercopa: ${supercupChampion}`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
             const btn = document.createElement('button');
             btn.className = 'choice-btn primary-option';
-            btn.innerText = 'Avanzar a la Siguiente Temporada';
+            btn.innerText = 'Iniciar Nueva Temporada';
             btn.onclick = () => loadFreeAgentEvent();
             container.appendChild(btn);
         }
 
-        window.onload = () => {
-            loadCreationScreen();
-        };
+        window.onload = () => { loadCreationScreen(); };
     </script>
 </body>
 </html>
