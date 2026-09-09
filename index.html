@@ -789,7 +789,11 @@
             updateUI();
 
             document.getElementById('event-title').innerText = `Resultado: ${game.team} ${myScore} - ${rivalScore} ${currentRival}`;
-            document.getElementById('event-desc').innerText = `Anotaste ${goalsScored} gol(es) en este encuentro.`;
+            
+            let goalsText = goalsScored > 0 
+                ? `Anotaste ${goalsScored} gol(es) en este encuentro.` 
+                : `No anotaste goles en este encuentro.`;
+            document.getElementById('event-desc').innerText = goalsText;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
