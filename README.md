@@ -1,4 +1,4 @@
-# tefi
+# NEWSLETTER TEFI
 
 1.0: Sin cambios, primera versión del juego
 
