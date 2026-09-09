@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Fútbol - Liga Única (Grupo A y B)</title>
+    <title>Simulador de Fútbol - Primera División</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -295,22 +295,22 @@
                 <h3>📊 Primera División - Tablas</h3>
                 
                 <div class="table-section">
-                    <h4>Grupo A (Puntero va a la Final)</h4>
+                    <h4>División 1 (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
                             <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
                         </thead>
-                        <tbody id="table-group-a"></tbody>
+                        <tbody id="table-div-1"></tbody>
                     </table>
                 </div>
 
                 <div class="table-section">
-                    <h4>Grupo B (Puntero va a la Final)</h4>
+                    <h4>División 2 (Puntero va a la Final)</h4>
                     <table class="standings-table">
                         <thead>
                             <tr><th>#</th><th>Equipo</th><th style="text-align:center;">PJ</th><th style="text-align:center;">PTS</th></tr>
                         </thead>
-                        <tbody id="table-group-b"></tbody>
+                        <tbody id="table-div-2"></tbody>
                     </table>
                 </div>
 
@@ -347,12 +347,12 @@
     </div>
 
     <script>
-        const initialGroupA = [
+        const initialDiv1 = [
             "Estudiantes LP (Rojo)", "Gimnasia y Esgrima", "Banco Provincia", "UNLP",
             "Efur A", "Almagro", "Erfi", "S.F.P. Gonnet", "Estudiantes LP (Gris)"
         ];
 
-        const initialGroupB = [
+        const initialDiv2 = [
             "DIVE", "Bosque del Plata", "El Potrero", "12 de Octubre",
             "Efi", "Judiciales", "Tres Estrellas", "Efur B", "Estudiantes LP (Dorado)", "Estudiantes LP (Blanco)"
         ];
@@ -364,10 +364,10 @@
             titles: 0, cups: 0, supercups: 0, isRetired: false
         };
 
-        let groupA = [], groupB = [];
+        let div1 = [], div2 = [];
         let leagueChampion = null, cupChampion = null, supercupChampion = null;
         let cupStage = 0, cupPlayerEliminated = false;
-        let cupEliminatedByPlayer = []; // Equipos eliminados directamente por el jugador en la copa
+        let cupEliminatedByPlayer = [];
         let championsHistory = [];
         let currentRival = "";
 
@@ -388,14 +388,14 @@
         }
 
         function initTables() {
-            groupA = initialGroupA.map(name => ({ name, pts: 0, pj: 0 }));
-            groupB = initialGroupB.map(name => ({ name, pts: 0, pj: 0 }));
+            div1 = initialDiv1.map(name => ({ name, pts: 0, pj: 0 }));
+            div2 = initialDiv2.map(name => ({ name, pts: 0, pj: 0 }));
             sortTables();
         }
 
         function resetSeasonPoints() {
-            groupA.forEach(t => { t.pts = 0; t.pj = 0; });
-            groupB.forEach(t => { t.pts = 0; t.pj = 0; });
+            div1.forEach(t => { t.pts = 0; t.pj = 0; });
+            div2.forEach(t => { t.pts = 0; t.pj = 0; });
             sortTables();
             cupStage = 0;
             cupPlayerEliminated = false;
@@ -406,23 +406,23 @@
         }
 
         function sortTables() {
-            groupA.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
-            groupB.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+            div1.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
+            div2.sort((a, b) => b.pts - a.pts || a.name.localeCompare(b.name));
         }
 
         function getAllTeams() {
-            return [...groupA.map(t => t.name), ...groupB.map(t => t.name)];
+            return [...div1.map(t => t.name), ...div2.map(t => t.name)];
         }
 
-        function getCurrentGroup() {
-            if (groupA.some(t => t.name === game.team)) return "Grupo A";
-            if (groupB.some(t => t.name === game.team)) return "Grupo B";
-            return "Sin Grupo";
+        function getCurrentDivision() {
+            if (div1.some(t => t.name === game.team)) return "División 1";
+            if (div2.some(t => t.name === game.team)) return "División 2";
+            return "Sin División";
         }
 
         function updateUI() {
             document.getElementById('player-name').innerText = game.name || "Jugador";
-            document.getElementById('player-details').innerText = `${game.team} (${getCurrentGroup()})`;
+            document.getElementById('player-details').innerText = `${game.team} (${getCurrentDivision()})`;
             document.getElementById('stat-age').innerText = game.age;
             document.getElementById('stat-energy').innerText = `${game.energy}/${game.maxEnergy}`;
             document.getElementById('stat-skill').innerText = game.skill;
@@ -455,8 +455,8 @@
                 `;
             }).join('');
 
-            document.getElementById('table-group-a').innerHTML = renderRows(groupA);
-            document.getElementById('table-group-b').innerHTML = renderRows(groupB);
+            document.getElementById('table-div-1').innerHTML = renderRows(div1);
+            document.getElementById('table-div-2').innerHTML = renderRows(div2);
         }
 
         function updatePalmaresUI() {
@@ -496,10 +496,10 @@
             let otherTeams = getAllTeams().filter(t => t !== game.team);
 
             otherTeams.forEach(club => {
-                let grp = groupA.some(t => t.name === club) ? "Grupo A" : "Grupo B";
+                let divName = div1.some(t => t.name === club) ? "División 1" : "División 2";
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
-                btn.innerText = `Fichar por ${club} (${grp})`;
+                btn.innerText = `Fichar por ${club} (${divName})`;
                 btn.onclick = () => { game.team = club; updateUI(); startSeasonLoop(); };
                 container.appendChild(btn);
             });
@@ -552,8 +552,8 @@
             let hasCurrentTeam = game.team !== "Sin Equipo";
 
             if (hasCurrentTeam) {
-                let currentGroup = getCurrentGroup();
-                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}.\n¿Quieres seguir en ${game.team} (${currentGroup}) o cambiar de equipo?`;
+                let currentDiv = getCurrentDivision();
+                document.getElementById('event-desc').innerText = `Edad: ${game.age} años | Temporada ${game.season}.\n¿Quieres seguir en ${game.team} (${currentDiv}) o cambiar de equipo?`;
                 
                 const stayBtn = document.createElement('button');
                 stayBtn.className = 'choice-btn primary-option';
@@ -568,10 +568,10 @@
             let offers = availableTeams.sort(() => 0.5 - Math.random()).slice(0, 3);
 
             offers.forEach(club => {
-                let grp = groupA.some(t => t.name === club) ? "Grupo A" : "Grupo B";
+                let divName = div1.some(t => t.name === club) ? "División 1" : "División 2";
                 const btn = document.createElement('button');
                 btn.className = 'choice-btn';
-                btn.innerText = `Fichar por ${club} (${grp})`;
+                btn.innerText = `Fichar por ${club} (${divName})`;
                 btn.onclick = () => { game.team = club; updateUI(); startSeasonLoop(); };
                 container.appendChild(btn);
             });
@@ -581,14 +581,13 @@
             document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Copa Nacional`;
             document.getElementById('event-title').innerText = `Copa Nacional - Ronda ${cupStage}`;
             
-            // Elegir rival entre los equipos que el jugador aún no eliminó ni su propio equipo
             let candidates = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
             let currentOpponent = candidates[Math.floor(Math.random() * candidates.length)];
             
             let playerWon = Math.random() < (game.skill / 100);
             
             if (playerWon) {
-                cupEliminatedByPlayer.push(currentOpponent); // Se guarda el rival como eliminado por el jugador
+                cupEliminatedByPlayer.push(currentOpponent);
                 
                 let myTeamGoals = Math.floor(Math.random() * 3) + 1;
                 let desiredGoals = calculateMatchGoals();
@@ -614,12 +613,7 @@
                 }
             } else {
                 cupPlayerEliminated = true;
-                
-                // Filtramos la lista de posibles campeones:
-                // EXCLUIMOS al equipo del jugador y a TODOS los equipos que el jugador eliminó previamente
                 let eligibleChampions = getAllTeams().filter(t => t !== game.team && !cupEliminatedByPlayer.includes(t));
-                
-                // Seleccionamos al azar el campeón únicamente de ese grupo de sobrevivientes
                 cupChampion = eligibleChampions[Math.floor(Math.random() * eligibleChampions.length)];
                 
                 document.getElementById('event-desc').innerText = `Quedaste eliminado ante ${currentOpponent}.\n\nTras el desarrollo del torneo, el campeón de la Copa fue ${cupChampion}.`;
@@ -654,14 +648,14 @@
             }
 
             game.matchCount++;
-            let currentGroup = getCurrentGroup();
-            let currentTable = currentGroup === "Grupo A" ? groupA : groupB;
+            let currentDivName = getCurrentDivision();
+            let currentTable = currentDivName === "División 1" ? div1 : div2;
 
             let opponents = currentTable.filter(t => t.name !== game.team).map(t => t.name);
             currentRival = opponents[Math.floor(Math.random() * opponents.length)];
 
             document.getElementById('week-display').innerText = `Temp. ${game.season} (${game.age} años) | Fecha ${game.matchCount}`;
-            document.getElementById('event-title').innerText = `${game.team} vs ${currentRival} (${currentGroup})`;
+            document.getElementById('event-title').innerText = `${game.team} vs ${currentRival} (${currentDivName})`;
             document.getElementById('event-desc').innerText = `Nivel: ${game.skill} | Energía: ${game.energy}/${game.maxEnergy}. Elige plan de partido:`;
 
             const container = document.getElementById('choices-container');
@@ -721,8 +715,8 @@
             let myScore = Math.floor(Math.random() * (game.skill / 20 + 1));
             let rivalScore = Math.floor(Math.random() * 3);
 
-            let isUserInA = groupA.some(t => t.name === game.team);
-            let playerTable = isUserInA ? groupA : groupB;
+            let isUserInDiv1 = div1.some(t => t.name === game.team);
+            let playerTable = isUserInDiv1 ? div1 : div2;
 
             let myTeamObj = playerTable.find(t => t.name === game.team);
             let rivalTeamObj = playerTable.find(t => t.name === currentRival);
@@ -744,8 +738,8 @@
                 if (rivalTeamObj) rivalTeamObj.pts += 3;
             }
 
-            simulateGroupRound(groupA, isUserInA ? game.team : null, isUserInA ? currentRival : null);
-            simulateGroupRound(groupB, !isUserInA ? game.team : null, !isUserInA ? currentRival : null);
+            simulateGroupRound(div1, isUserInDiv1 ? game.team : null, isUserInDiv1 ? currentRival : null);
+            simulateGroupRound(div2, !isUserInDiv1 ? game.team : null, !isUserInDiv1 ? currentRival : null);
 
             let desiredGoals = calculateMatchGoals();
             let goalsScored = Math.min(myScore, desiredGoals);
@@ -756,7 +750,7 @@
 
             document.getElementById('event-title').innerText = `Resultado: ${game.team} ${myScore} - ${rivalScore} ${currentRival}`;
             let goalsText = goalsScored > 0 ? ` ¡Convertiste ${goalsScored} gol(es)!` : '';
-            document.getElementById('event-desc').innerText = `Finalizó el partido.${goalsText}\nUbicación en la tabla del ${getCurrentGroup()}: ${playerTable.findIndex(t => t.name === game.team) + 1}º puesto.`;
+            document.getElementById('event-desc').innerText = `Finalizó el partido.${goalsText}\nUbicación en la tabla de ${getCurrentDivision()}: ${playerTable.findIndex(t => t.name === game.team) + 1}º puesto.`;
 
             const container = document.getElementById('choices-container');
             container.innerHTML = '';
@@ -769,14 +763,14 @@
 
         function playFinalMatch() {
             sortTables();
-            let winnerA = groupA[0].name;
-            let winnerB = groupB[0].name;
+            let winner1 = div1[0].name;
+            let winner2 = div2[0].name;
 
             document.getElementById('week-display').innerText = `Temp. ${game.season} | Gran Final de Liga`;
-            document.getElementById('event-title').innerText = `🏆 GRAN FINAL: ${winnerA} vs ${winnerB}`;
+            document.getElementById('event-title').innerText = `🏆 GRAN FINAL: ${winner1} vs ${winner2}`;
 
-            let isUserInFinal = (winnerA === game.team || winnerB === game.team);
-            let rivalFinal = winnerA === game.team ? winnerB : winnerA;
+            let isUserInFinal = (winner1 === game.team || winner2 === game.team);
+            let rivalFinal = winner1 === game.team ? winner2 : winner1;
 
             if (isUserInFinal) {
                 let myScore = Math.floor(Math.random() * (game.skill / 18 + 1)) + 1;
@@ -799,9 +793,9 @@
                     document.getElementById('event-desc').innerText = `Caíste en la Final de Liga.\n\n${game.team} ${myScore} - ${rivalScore} ${rivalFinal}\nConvertiste ${goalsScored} gol(es).\n\nEl campeón es ${rivalFinal}.`;
                 }
             } else {
-                leagueChampion = Math.random() < 0.5 ? winnerA : winnerB;
-                let loserFinal = leagueChampion === winnerA ? winnerB : winnerA;
-                document.getElementById('event-desc').innerText = `No lograste quedar 1° de tu grupo para jugar la final.\n\nEn la Gran Final de la Liga:\n🏆 ${leagueChampion} superó a ${loserFinal} y se coronó Campeón.`;
+                leagueChampion = Math.random() < 0.5 ? winner1 : winner2;
+                let loserFinal = leagueChampion === winner1 ? winner2 : winner1;
+                document.getElementById('event-desc').innerText = `No lograste quedar 1° de tu división para jugar la final.\n\nEn la Gran Final de Primera División:\n🏆 ${leagueChampion} superó a ${loserFinal} y se coronó Campeón.`;
             }
 
             updateUI();
