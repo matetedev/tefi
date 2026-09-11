@@ -347,12 +347,9 @@
     </div>
 
     <script>
-        const initialDiv1 = [
+        const allBaseTeams = [
             "Estudiantes LP (Rojo)", "Gimnasia y Esgrima", "Banco Provincia", "UNLP",
-            "Efur A", "Almagro", "Erfi", "S.F.P. Gonnet", "Estudiantes LP (Gris)"
-        ];
-
-        const initialDiv2 = [
+            "Efur A", "Almagro", "Erfi", "S.F.P. Gonnet", "Estudiantes LP (Gris)",
             "DIVE", "Bosque del Plata", "El Potrero", "12 de Octubre",
             "Efi", "Judiciales", "Tres Estrellas", "Efur B", "Estudiantes LP (Dorado)", "Estudiantes LP (Blanco)"
         ];
@@ -372,6 +369,7 @@
         let currentRival = "";
 
         const TOTAL_LEAGUE_MATCHES = 9;
+        const MAX_AGE_LIMIT = 15;
 
         function calculateMatchGoals() {
             let rand = Math.random();
@@ -387,16 +385,23 @@
             }
         }
 
-        function initTables() {
-            div1 = initialDiv1.map(name => ({ name, pts: 0, pj: 0 }));
-            div2 = initialDiv2.map(name => ({ name, pts: 0, pj: 0 }));
+        function shuffleAndDraftGroups() {
+            let shuffled = [...allBaseTeams].sort(() => Math.random() - 0.5);
+            let half = Math.ceil(shuffled.length / 2);
+            let groupA = shuffled.slice(0, half);
+            let groupB = shuffled.slice(half);
+
+            div1 = groupA.map(name => ({ name, pts: 0, pj: 0 }));
+            div2 = groupB.map(name => ({ name, pts: 0, pj: 0 }));
             sortTables();
         }
 
+        function initTables() {
+            shuffleAndDraftGroups();
+        }
+
         function resetSeasonPoints() {
-            div1.forEach(t => { t.pts = 0; t.pj = 0; });
-            div2.forEach(t => { t.pts = 0; t.pj = 0; });
-            sortTables();
+            shuffleAndDraftGroups();
             cupStage = 0;
             cupPlayerEliminated = false;
             cupEliminatedByPlayer = [];
@@ -513,7 +518,7 @@
 
         function loadCreationScreen() {
             document.getElementById('event-title').innerText = "Ficha del Futbolista";
-            document.getElementById('event-desc').innerText = "Ingresa tus datos para dar inicio a tu carrera (7 a 15 años).";
+            document.getElementById('event-desc').innerText = `Ingresa tus datos para dar inicio a tu carrera (7 a ${MAX_AGE_LIMIT} años).`;
             const container = document.getElementById('choices-container');
             container.innerHTML = `
                 <div class="form-group"><label>Nombre y Apellido</label><input type="text" id="input-name" value="Crack Martínez"></div>
@@ -890,10 +895,10 @@
             game.age++;
             game.matchCount = 0;
 
-            if (game.age > 40) {
+            if (game.age > MAX_AGE_LIMIT) {
                 game.isRetired = true;
                 document.getElementById('event-title').innerText = "🏁 Retiro Profesional";
-                document.getElementById('event-desc').innerText = `Te has retirado del fútbol a los ${game.age} años.\nRevisa tu palmarés para ver tus conquistas.`;
+                document.getElementById('event-desc').innerText = `Te has retirado del fútbol al alcanzar los ${MAX_AGE_LIMIT} años.\nRevisa tu palmarés para ver tus conquistas.`;
                 document.getElementById('choices-container').innerHTML = '';
                 return;
             }
